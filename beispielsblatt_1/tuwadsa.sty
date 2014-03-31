@@ -1,0 +1,222 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{tuwadsa}[2008/07/10 AlgoDat package]
+
+%%% Other packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\RequirePackage{comment}
+\RequirePackage{algorithmicGerman}
+\RequirePackage{color}
+\RequirePackage{epsfig}
+\RequirePackage{ifthen}
+\RequirePackage{ngerman}
+\RequirePackage{url}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{amsthm}
+\RequirePackage{fullpage}
+\RequirePackage{multirow}
+
+%%% Counters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcounter{angabe}
+\renewcommand{\theangabe}{\arabic{angabe}}
+
+\newcounter{ueenumi}
+\renewcommand{\theueenumi}{\alph{ueenumi}}
+
+%%% Internal commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\@warningbg}{white}
+
+\newcommand{\@sectionend}{\par\nopagebreak\hrulefill%
+	\vspace{\parskip}\ignorespacesafterend}
+
+\newcommand{\@angabebegin}{%
+	\refstepcounter{angabe}
+	\paragraph{Aufgabe \theangabe}\nopagebreak}
+
+\newcommand{\@ueblattshort}{%
+	\begin{center}
+	{\large\sf\bfseries 186.813 Algorithmen und Datenstrukturen 1 VU 6.0}
+
+	\section*{Musterlösung für das Beispielblatt \@ueblattnr}
+	\@uedatum
+	\end{center}
+}
+
+\newcommand{\@ueblattlong}{
+	\vspace*{-2cm}
+	\begin{minipage}{2.2cm}
+		\epsfig{file=ads.eps, width=1.9cm}
+	\end{minipage}
+	\hfill
+	\begin{minipage}{10cm}
+		\begin{center}
+			\sf
+			\smallskip Technische Universität Wien \par
+			\smallskip Institut für Computergraphik
+				und Algorithmen \par
+			\smallskip Arbeitsbereich für Algorithmen
+				und Datenstrukturen \par
+		\end{center}
+	\end{minipage}
+	\hfill
+	\begin{minipage}{2.2cm}
+		\hfill
+		\epsfig{file=tu_logo.eps, scale=0.76}
+	\end{minipage}
+
+	\begin{center}
+		{
+			\large\sf\bfseries
+			186.813 Algorithmen und Datenstrukturen 1 VU 6.0
+		}
+
+		\section*{Beispielblatt \@ueblattnr}
+		\@uedatum
+	\end{center}
+
+	\setlength{\fboxrule}{2mm}
+
+	\fcolorbox{red}{\@warningbg}{\parbox{\textwidth}{
+	Geben Sie bis \textbf{spätestens \@deadline} Ihre ausgearbeiteten Beispiele in Form \textbf{eines} PDF-Dokuments über TUWEL ab. Gehen Sie dabei folgendermaßen vor:
+
+	\begin{itemize}
+		\item TUWEL (\url{https://tuwel.tuwien.ac.at}) \\
+		Kurs \emph{186.813 Algorithmen und Datenstrukturen 1 (VU 6.0)}
+		\item Thema \emph{Beispielblatt \@ueblattnr} 
+		\item Button \emph{Datei hochladen} \\
+		(Nur PDF-Format erlaubt, Größe maximal 10 MB.)
+	\end{itemize}
+
+	Bitte beachten Sie: 
+	\begin{itemize}
+	\item Sie können \textbf{vor} der Deadline beliebig oft Ihre Lösung hochladen, aber \textbf{nach} 
+        der Deadline ist \textbf{kein} Hochladen mehr möglich!
+	\item Die Beispielblätter werden von Tutoren durchgesehen und kommentiert. Sie sehen diese Kommentare
+	als Feedback in TUWEL unter \emph{Beispielblatt \@ueblattnr}. Diese Kommentare sollen Ihnen helfen, Ihr 
+        Verständnis für die Beispiele zu vertiefen, sollen aber nicht als Musterlösungen angesehen 
+        werden.
+  \item Sie können Ihre Lösungen entweder direkt in einem Textverarbeitungsprogramm erstellen, oder
+        aber auch gut leserliche Scans bzw.\ Fotos von handschriftlichen Ausarbeitungen einreichen.
+  \item Bitte geben Sie Ihren Namen, Matrikelnummer und E-Mail-Adresse in den Ausarbeitungen an.
+	\end{itemize}
+	}}
+
+	\setlength{\fboxrule}{0.25mm}
+
+	\clearpage
+}
+
+
+%%% Environments %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\typeout{Default-Output-Style: Angabe}
+\newenvironment{angabe}{\@angabebegin}{\@sectionend}
+\newenvironment{loesung}{}{}
+\newenvironment{kommentar}{}{}
+
+\newenvironment{ueenumerate}{%
+	\begin{list}{(\theueenumi)}{
+		\usecounter{ueenumi}
+		\setlength{\topsep}{0mm}
+		\setlength{\partopsep}{0mm}
+		\setlength{\itemsep}{0mm}
+		\setlength{\leftmargin}{8mm}
+		\setlength{\labelwidth}{6mm}
+		\setlength{\labelsep}{2mm}
+		\renewcommand{\makelabel}[1]{##1\hfill}
+	}
+}{%
+	\end{list}
+}
+
+\newenvironment{ueitemize}{%
+	\begin{list}{}{
+		\setlength{\topsep}{0mm}
+		\setlength{\partopsep}{0mm}
+		\setlength{\itemsep}{0mm}
+		\setlength{\leftmargin}{8mm}
+		\setlength{\labelwidth}{6mm}
+		\setlength{\labelsep}{2mm}
+		\renewcommand{\makelabel}[1]{\hfill $\bullet$}
+	}
+}{%
+	\end{list}
+}
+
+%%% Options %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\DeclareOption{warnung}{\renewcommand{\@warningbg}{yellow}}
+
+\DeclareOption{angabe}{
+	\typeout{Output-Style: Angabe}
+	\providecommand{\ueblatt}{\@ueblattlong}
+	\renewenvironment{angabe}{\@angabebegin}{\@sectionend}
+	\renewenvironment{loesung}{}{}
+}
+
+\DeclareOption{loesung}{
+	\providecommand{\ueblatt}{\@ueblattshort}
+	\typeout{Output-Style: Loesung}
+	\renewenvironment{angabe}{\@angabebegin\slshape}{\@sectionend}
+	\renewenvironment{loesung}{\paragraph{Lösung}%
+		\nopagebreak}{\@sectionend}
+}
+
+\DeclareOption{katalog}{
+	\providecommand{\ueblatt}{}
+	\typeout{Output-Style: Katalog}
+	\renewenvironment{angabe}{}{}
+	\renewenvironment{loesung}{}{}
+}
+
+\ProcessOptions\relax
+
+%%% Logos %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\IfFileExists{ads.eps}{%
+	\typeout{File found: ads.eps}
+}{%
+	\PackageError{tuwadsa}{File NOT found: ads.eps}{FIXME: Help text}
+}
+
+\IfFileExists{tu_logo.eps}{%
+	\typeout{File found: tu_logo.eps}
+}{%
+	\PackageError{tuwadsa}{File NOT found: tu_log.eps}{FIXME: Help text}
+}
+
+%%% Commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\var}{\ensuremath{\mathbf{var}\quad}}
+
+\newcommand{\zugriff}[1]{}
+
+\newcommand{\ueblattnr}[1]{\providecommand{\@ueblattnr}{#1}}
+\newcommand{\uedatum}[1]{\providecommand{\@uedatum}{#1}}
+\newcommand{\deadline}[1]{\providecommand{\@deadline}{#1}}
+
+% Check if the above commands are all executed in the preamble.
+\AtBeginDocument{
+	\ifthenelse{\isundefined{\@ueblattnr}}{%
+		\PackageError{tuwadsa}{ueblattnr
+			not defined!}{FIXME: helptext}}{}
+	\ifthenelse{\isundefined{\@uedatum}}{%
+		\PackageError{tuwadsa}{uedatum not defined!}{FIXME: helptext}}{}
+	\ifthenelse{\isundefined{\@deadline}}{%
+		\PackageError{tuwadsa}{deadline not defined!}{FIXME: helptext}}{}
+} % AtBeginDocument
+
+%%% Floats %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newfloat{algorithm}{htbp}{loa}
+
+%%% Layout %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\sloppy
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{1.5ex plus 0.5ex minus 0.5ex}
+
+\thispagestyle{empty}
