@@ -5,6 +5,10 @@ import ads1.ss14.can.exceptions.NoAdditionalStorageAvailable;
 import ads1.ss14.can.exceptions.NoSuchDocument;
 
 public class Client implements ClientInterface, ClientCommandInterface{
+	
+	private String uniqueID;
+    private int networkXSize,networkYSize,maxNumberOfDocuments;
+
 	/**
 	 * Constructs a new Client
 	 * @param uniqueID the ID of the Client in the CAN
@@ -12,24 +16,24 @@ public class Client implements ClientInterface, ClientCommandInterface{
 	 * @param networkYSize the size along the vertical axis in the CAN
 	 */
 	public Client(String uniqueID, int networkXSize, int networkYSize) {
-		//TODO Implement me!
+		this.uniqueID = uniqueID;
+		this.networkXSize = networkXSize;
+		this.networkYSize = networkYSize;
 	}
 
 	@Override
 	public String getUniqueID() {
-		//TODO Implement me!
-		return null;
+        return uniqueID;
 	}
 
 	@Override
 	public void setMaxNumberOfDocuments(int m) {
-		//TODO Implement me!
+		this.maxNumberOfDocuments = m;
 	}
 
 	@Override
 	public int getMaxNumberOfDocuments() {
-		//TODO Implement me!
-		return -1;
+        return this.maxNumberOfDocuments;
 	}
 
 	@Override
