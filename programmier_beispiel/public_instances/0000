@@ -1,0 +1,53 @@
+network 16 4
+begin_load_can
+    client3 <client0, 1>: client4, client5, client0
+    client4 <client3, 1>: client1, client5, client3
+    client1 <client0, 1>: client2, client4, client5
+    client5 <client4, 1>: client4, client1, client3
+    client2 <client1, 1>: client1
+    client0 <null, 17>: client3
+  --- stored documents ---
+    client3: qqe, m
+    client4: qqg
+    client1: ql, qqi
+    client5: qg, h
+    client2: qm, qqqp, p, o
+    client0: qa, zzzzzd, qqqd, aa
+end_load_can
+
+begin_test_can
+  client0: client3
+  client1: client4, client5, client2
+  client2: client1
+  client3: client4, client5, client0
+  client4: client1, client5, client3
+  client5: client4, client1, client3
+  --- stored
+  client0: aa, qa, zzzzzd, qqqd
+  client1: qqi, ql
+  client2: qm, o, p, qqqp
+  client3: qqe, m
+  client4: qqg
+  client5: qg, h
+end_test_can
+
+search client0 qqqp
+test_search client0 client3 client4 client1 client2
+
+search client5 h
+test_search client5
+
+search client2 aa
+test_search client2 client1 client5 client3 client0
+
+search client0 m
+test_search client0 client3 client5 client1 client2 null client0 client3
+
+search client2 m
+test_search client2 null client2 client1 client5 client3
+
+search client1 m
+test_search client1 client2 null client1 client5 client3
+
+search client3 unknown
+test_search client3 client5 client1 null client3 client0 null client3 client5 null client3 client5 client1 client2 null client3 null client3 client5 client1 client2 null client3 client0 null client3 client5 client1 null client3 client0 null client3 client4 client1 null client3 client5 client1 client2 null client3 client4 null client3 client4 client1 client2 null client3 null client3 client5 client1 null client3 client0 null client3 client5 client1 null client3 client0 null client3 client5 null client3 client5 client1 client2 null client3 null client3 client5 client1 client2 null client3 client0 null client3 client4 client1 null client3 client0 null client3 client5 client1 null client3 client4 client1 client2 null client3 client5 null client3 client5 client1 client2 null client3 null client3 client5 client1 null client3 client0 null client3 client5 client1 null client3 client0 null client3 client4 null client3 client5 client1 client2 null client3 null client3 client4 client1 client2 null client3 client0 null client3 client5 client1 null client3 client0 null client3 client5 client1 null client3 client5 client1 client2 null client3 client5 null client3 client5 client1 client2 null client3 null client3 client5 client1 null client3 client0 null client3 client4 client1 null client3 client0 null client3 client4 null client3 client4 client1 client2 null client3 null client3 client5 client1 client2 null client3 client0 null client3 client5 client1 null client3 client0 null client3 client5 client1 null client3 client5 client1 client2 null client3 client4 null client3 client5 client1 client2 null client3 null client3 client4 client1 null client3 client0 null

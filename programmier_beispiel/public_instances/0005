@@ -1,0 +1,84 @@
+network 16 4
+begin_load_can
+    client3 <client0, 1>: client4, client5, client0
+    client4 <client3, 1>: client1, client5, client3
+    client1 <client0, 2>: client2, client4, client5
+    client5 <client4, 2>: client4, client1, client3
+    client2 <client1, 4>: client1
+    client0 <null, 17>: client3
+  --- stored documents ---
+    client3:
+    client4:
+    client1:
+    client5:
+    client2:
+    client0:
+end_load_can
+
+add client2 qqe
+add client4 qqg
+add client0 ql
+add client5 qqi
+add client2 h
+add client3 qg
+add client2 qm
+add client1 qqqp
+add client4 p
+add client0 o
+add client1 qa
+add client3 qqqd
+add client5 aa
+
+begin_test_can
+  client0: client3
+  client1: client4, client5, client2
+  client2: client1
+  client3: client4, client5, client0
+  client4: client1, client5, client3
+  client5: client4, client1, client3
+  --- stored
+  client0: aa, qa, qqqd
+  client1: qqi, ql
+  client2: qm, o, p, qqqp
+  client3: qqe
+  client4: qqg
+  client5: qg, h
+end_test_can
+
+delete client3 o
+delete client2 qa
+add client4 qqn
+
+begin_test_can
+  client0: client3
+  client1: client4, client5, client2
+  client2: client1
+  client3: client4, client5, client0
+  client4: client1, client5, client3
+  client5: client4, client1, client3
+  --- stored
+  client0: aa, qqqd
+  client1: qqi, ql
+  client2: qm, p, qqqp, qqn
+  client3: qqe
+  client4: qqg
+  client5: qg, h
+end_test_can
+
+add client0 m
+
+begin_test_can
+  client0: client3
+  client1: client4, client5, client2
+  client2: client1
+  client3: client4, client5, client0
+  client4: client1, client5, client3
+  client5: client4, client1, client3
+  --- stored
+  client0: aa, qqqd, m
+  client1: qqi, ql
+  client2: qm, p, qqqp, qqn
+  client3: qqe
+  client4: qqg
+  client5: qg, h
+end_test_can
