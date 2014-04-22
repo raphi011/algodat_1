@@ -153,43 +153,74 @@ public class Client implements ClientInterface, ClientCommandInterface{
 
     @Override
     public ClientInterface joinNetwork(ClientInterface entryPoint, Position p) throws CANException {
-        ClientInterface responsibleClient = entryPoint.searchForResponsibleClient(p);
+        if (entryPoint == null) {
+            this.area = new Area(0, networkXSize, 0, networkYSize);
+            return null;
+        }
+        else {
+            ClientInterface client = entryPoint.searchForResponsibleClient(p);
+            Area area = client.getArea();
+            // Area too small, can't join
+            if ((area.getUpperX() - area.getLowerX()) < 1 || (area.getUpperY() - area.getLowerY()) < 1)
+                return null;
+            else if (Math.abs(area.getLowerX() - area.getUpperX()) >= Math.abs(area.getLowerY() - area.getUpperY())) {
+                Pair<Area,Area> splitAreas = area.splitVertically();
 
-        Area area = responsibleClient.getArea();
-        Pair<Area,Area> splitAreas = null;
-        if (area.getUpperX() - area.getLowerX() >= area.getUpperY() - area.getLowerY())
-            splitAreas = area.splitVertically();
-        else
-            splitAreas = area.splitHorizontally();
+                client.setArea(splitAreas.first);
+                this.setArea(splitAreas.second);
+            }
+            else /* Math.abs(area.getLowerX() - area.getUpperX()) < Math.abs(area.getLowerY() - area.getUpperY()) */ {
+                Pair<Area,Area> splitAreas = area.splitHorizontally();
 
-        this.setArea(splitAreas.first);
+                client.setArea(splitAreas.second);
+                this.setArea(splitAreas.first);
+            }
 
-        responsibleClient.setArea(splitAreas.second);
-        responsibleClient.adaptNeighbours(this);
+            client.adaptNeighbours(this);
 
+            for (Pair<Document,Position> doc : client.removeUnmanagedDocuments())
+                documents.put(doc.first.getName(),new Pair<Document,Position>(doc.first,doc.second));
 
-
-        return null;
+            return client;
+        }
     }
-
 
     @Override
     public void adaptNeighbours(ClientInterface joiningClient) {
-        for (Pair<Document,Position> pair : removeUnmanagedDocuments()) {
-            try {
-                joiningClient.storeDocument(pair.first,pair.second);
-            } catch (Exception ex) { }
-        }
+
+        boolean horizontalSplit = this.getArea().getLowerX() == joiningClient.getArea().getLowerX();
+
+        Area joiningArea = joiningClient.getArea();
+        double joiningLower = horizontalSplit ? joiningArea.getLowerY() : joiningArea.getLowerX();
+        double joiningUpper = horizontalSplit ? joiningArea.getUpperY() : joiningArea.getUpperX();
 
         ArrayList<ClientInterface> neighboursCopy = new ArrayList<ClientInterface>(neighbours);
+
         for (ClientInterface neighbour : neighboursCopy) {
+            Area neighbourArea = neighbour.getArea();
 
+            double neighbourLower = horizontalSplit ? neighbourArea.getLowerY() : neighbourArea.getLowerX();
+            double neighbourUpper = horizontalSplit ? neighbourArea.getUpperY() : neighbourArea.getUpperX();
 
+            if (horizontalSplit && neighbourUpper == joiningLower ||
+                    !horizontalSplit && neighbourLower == joiningUpper) {
+                neighbour.removeNeighbour(this.uniqueID);
+                neighbour.addNeighbour(joiningClient);
+                this.removeNeighbour(neighbour.getUniqueID());
+                joiningClient.addNeighbour(neighbour);
+            } else if (neighbourLower <= joiningLower && joiningLower < neighbourUpper ||
+                       neighbourLower < joiningUpper && joiningUpper <= neighbourUpper) {
+                joiningClient.addNeighbour(neighbour);
+                neighbour.addNeighbour(joiningClient);
+            } else if (!(neighbourLower <= joiningLower && joiningLower < neighbourUpper ||
+                         neighbourLower < joiningUpper && joiningUpper <= neighbourUpper)) {
+                this.removeNeighbour(neighbour.getUniqueID());
+                neighbour.removeNeighbour(this.uniqueID);
+            }
         }
 
-
-
-
+        this.addNeighbour(joiningClient);
+        joiningClient.addNeighbour(this);
     }
 
     @Override
