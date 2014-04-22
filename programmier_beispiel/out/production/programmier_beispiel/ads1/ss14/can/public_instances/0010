@@ -1,0 +1,73 @@
+network 16 4
+join first null 10 3 17
+add first aa
+add first qa
+add first zzzzzd
+add first qqqd
+
+add first qqe
+add first qqg
+
+add first qg
+add first h
+
+add first qqi
+add first ql
+
+add first qm
+add first o
+add first p
+add first qqqp
+
+
+join second first 10 3 1
+join third first 15 3 1
+add third m
+
+begin_test_can
+  first: second
+  second: first, third
+  third: second
+  --- stored
+  first: aa, qa, zzzzzd, qqqd, qqe, qqg, qg, h, m
+  second: qqi, ql
+  third: qm, o, p, qqqp
+end_test_can
+
+search first qqqp
+test_search first second third
+
+search third m
+
+join fourth third 0 3 1
+
+begin_test_can
+  first: fourth
+  second: fourth, third
+  third: second
+  fourth: first, second
+  --- stored
+  first: aa, qa, zzzzzd, qqqd
+  second: qqi, ql
+  third: qm, o, p, qqqp
+  fourth: qqe, qqg, qg, h, m
+end_test_can
+
+join fifth second 6 3 1
+join sixth second 6 3 1
+
+begin_test_can
+  first: fourth
+  second: fifth, sixth, third
+  third: second
+  fourth: fifth, sixth, first
+  fifth: second, sixth, fourth
+  sixth: fifth, second, fourth
+  --- stored
+  first: aa, qa, zzzzzd, qqqd
+  second: qqi, ql
+  third: qm, o, p, qqqp
+  fourth: qqe, m
+  fifth: qqg
+  sixth: qg, h
+end_test_can

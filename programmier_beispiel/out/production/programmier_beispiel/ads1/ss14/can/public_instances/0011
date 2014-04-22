@@ -1,0 +1,288 @@
+network 8 8
+join client0 null 4 1 2
+begin_test_can
+    client0: 
+  --- stored documents ---
+    client0: 
+end_test_can
+join client1 client0 7 5 0
+begin_test_can
+    client0: client1
+    client1: client0
+  --- stored documents ---
+    client0: 
+    client1: 
+end_test_can
+join client2 client1 2 5 1
+begin_test_can
+    client0: client1, client2
+    client1: client0, client2
+    client2: client0, client1
+  --- stored documents ---
+    client0: 
+    client1: 
+    client2: 
+end_test_can
+add client1 ov
+begin_test_can
+    client0: client1, client2
+    client1: client0, client2
+    client2: client0, client1
+  --- stored documents ---
+    client0: ov
+    client1: 
+    client2: 
+end_test_can
+add client2 hxm
+begin_test_can
+    client0: client1, client2
+    client1: client0, client2
+    client2: client0, client1
+  --- stored documents ---
+    client0: ov, hxm
+    client1: 
+    client2: 
+end_test_can
+add client2 nnr
+begin_test_can
+    client0: client1, client2
+    client1: client0, client2
+    client2: client0, client1
+  --- stored documents ---
+    client0: ov, hxm
+    client1: 
+    client2: nnr
+end_test_can
+search client1 nnr
+test_search client1 client0 null client1 client2
+
+add client1 f
+begin_test_can
+    client0: client1, client2
+    client1: client0, client2
+    client2: client0, client1
+  --- stored documents ---
+    client0: ov, hxm
+    client1: 
+    client2: nnr
+end_test_can
+add client0 g
+begin_test_can
+    client0: client1, client2
+    client1: client0, client2
+    client2: client0, client1
+  --- stored documents ---
+    client0: ov, hxm
+    client1: 
+    client2: nnr
+end_test_can
+add client1 t
+begin_test_can
+    client0: client1, client2
+    client1: client0, client2
+    client2: client0, client1
+  --- stored documents ---
+    client0: ov, hxm
+    client1: 
+    client2: nnr
+end_test_can
+delete client2 t
+begin_test_can
+    client0: client1, client2
+    client1: client0, client2
+    client2: client0, client1
+  --- stored documents ---
+    client0: ov, hxm
+    client1: 
+    client2: nnr
+end_test_can
+delete client0 g
+begin_test_can
+    client0: client1, client2
+    client1: client0, client2
+    client2: client0, client1
+  --- stored documents ---
+    client0: ov, hxm
+    client1: 
+    client2: nnr
+end_test_can
+join client3 client2 7 0 0
+begin_test_can
+    client3: client1, client2
+    client0: client1, client2
+    client1: client3, client0
+    client2: client0, client3
+  --- stored documents ---
+    client3: 
+    client0: ov, hxm
+    client1: 
+    client2: nnr
+end_test_can
+search client0 hxm
+test_search client0
+
+search client1 hxm
+test_search client1 client0
+
+join client4 client2 4 1 0
+begin_test_can
+    client3: client1, client4, client2
+    client4: client1, client3
+    client0: client1, client2
+    client1: client3, client4, client0
+    client2: client0, client3
+  --- stored documents ---
+    client3: 
+    client4: 
+    client0: ov, hxm
+    client1: 
+    client2: nnr
+end_test_can
+add client4 noi
+begin_test_can
+    client3: client1, client4, client2
+    client4: client1, client3
+    client0: client1, client2
+    client1: client3, client4, client0
+    client2: client0, client3
+  --- stored documents ---
+    client3: 
+    client4: 
+    client0: ov, hxm
+    client1: 
+    client2: nnr
+end_test_can
+delete client1 ov
+begin_test_can
+    client3: client1, client4, client2
+    client4: client1, client3
+    client0: client1, client2
+    client1: client3, client4, client0
+    client2: client0, client3
+  --- stored documents ---
+    client3: 
+    client4: 
+    client0: hxm
+    client1: 
+    client2: nnr
+end_test_can
+delete client1 noi
+begin_test_can
+    client3: client1, client4, client2
+    client4: client1, client3
+    client0: client1, client2
+    client1: client3, client4, client0
+    client2: client0, client3
+  --- stored documents ---
+    client3: 
+    client4: 
+    client0: hxm
+    client1: 
+    client2: nnr
+end_test_can
+search client4 nnr
+test_search client4 client1 client0 null client4 client3 client2
+
+search client4 op
+test_search client4 client3 null client4 client3 client2 null client4 client3 client2 null client4 null client4 client3 client2 null client4 client3 null client4 client1 null client4 client1 client0 null client4 client1 null client4 client1 client0 null client4 client1 client0 null client4 client1 null client4 client3 client2 client0 null client4 client3 null client4 null client4 client3 client2 null client4 client3 null client4 client3 client2 null client4 client3 client2 null client4 client1 null client4 client1 client0 null client4 client1 null client4 client1 null client4 client1 client0 null client4 client1 null client4 client3 client2 client0 null client4 client3 client2 null client4 null client4 client3 client2 null client4 client3 null client4 null client4 client3 client2 null client4 client1 null client4 client1 client0 null client4 client1 client0 null client4 client1 null client4 client1 client0 null client4 client1 null client4 null client4 client3 client2 null client4 client3 null client4 client3 client2 null client4 client3 client2 null client4 null client4 client3 client2 null client4 client1 null client4 client1 null client4 client1 client0 null client4 client1 null client4 client1 client0 null client4 client3 client2 client0 null client4 null client4 client3 client2 null client4 client3 null client4 null client4 client3 client2 null client4 client3 null client4 client3 client2 null client4 client1 client0 null client4 client1 null client4 client1 client0 null client4 client1 null client4 client1 null client4 client3 client2 client0 null
+
+delete client1 nnr
+begin_test_can
+    client3: client1, client4, client2
+    client4: client1, client3
+    client0: client1, client2
+    client1: client3, client4, client0
+    client2: client0, client3
+  --- stored documents ---
+    client3: 
+    client4: 
+    client0: hxm
+    client1: 
+    client2: 
+end_test_can
+search client0 dje
+test_search client0 client2 null client0 null client0 client2 null client0 null client0 client2 client3 null client0 client1 null client0 client2 client3 client4 null client0 client1 null client0 client2 null client0 null client0 client2 null client0 null client0 client2 client3 null client0 client1 null client0 client1 client4 null client0 client1 null client0 null client0 client2 null client0 null client0 client2 null client0 client1 null client0 client2 client3 null client0 client1 null client0 client2 client3 client4 null client0 null client0 client2 null client0 null client0 client2 null client0 client1 null client0 client2 client3 null client0 client1 null client0 client2 client3 client4 null client0 null client0 client2 null client0 null client0 client2 null client0 client1 null client0 client2 client3 null client0 client1 null client0 client1 client4 null client0 null client0 client2 null client0 null client0 client2 null client0 client1 null client0 client2 client3 null client0 client1 null client0 client1 client4 null client0 client2 null client0 null client0 client2 null client0 null client0 client2 client3 null client0 client1 null client0 client2 client3 client4 null client0 client1 null client0 client2 null client0 null client0 client2 null client0 null client0 client2 client3 null client0 client1 null client0 client2 client3 client4 null client0 client1 null
+
+delete client4 hxm
+begin_test_can
+    client3: client1, client4, client2
+    client4: client1, client3
+    client0: client1, client2
+    client1: client3, client4, client0
+    client2: client0, client3
+  --- stored documents ---
+    client3: 
+    client4: 
+    client0: 
+    client1: 
+    client2: 
+end_test_can
+add client1 nx
+begin_test_can
+    client3: client1, client4, client2
+    client4: client1, client3
+    client0: client1, client2
+    client1: client3, client4, client0
+    client2: client0, client3
+  --- stored documents ---
+    client3: 
+    client4: 
+    client0: 
+    client1: 
+    client2: nx
+end_test_can
+search client3 f
+test_search client3 null client3 client2 null client3 client2 null client3 client1 null client3 client2 client0 null client3 client1 null client3 client4 null client3 client2 null client3 null client3 client2 client0 null client3 client1 client0 null client3 client1 null client3 client2 null client3 null client3 client4 null client3 client2 client0 null client3 client1 null client3 client2 null client3 client2 null client3 client4 null client3 client2 client0 null client3 client1 null client3 client1 null client3 client2 null client3 null client3 client2 null client3 client2 client0 null client3 client1 null client3 client2 client0 null client3 null client3 client4 null client3 client2 null client3 client1 null client3 client2 client0 null client3 client1 client0 null client3 client4 null client3 client2 null client3 null client3 client1 null client3 client2 client0 null client3 client1 null client3 client2 null client3 client2 null client3 client4 null client3 client2 client0 null client3 client1 null client3 client1 null client3 client2 null client3 null client3 client2 client0 null client3 client2 client0 null client3 client1 null client3 client2 null client3 null client3 client4 null client3 client2 client0 null client3 client1 null client3 client2 client0 null client3 client2 null client3 client4 null client3 client2 null client3 client1 null client3 client1 null client3 client1 client0 null
+
+join client5 client0 3 1 2
+begin_test_can
+    client3: client1, client4, client5
+    client4: client1, client3
+    client5: client0, client3, client2
+    client0: client1, client5, client2
+    client1: client3, client4, client0
+    client2: client0, client5
+  --- stored documents ---
+    client3: 
+    client4: 
+    client5: 
+    client0: 
+    client1: 
+    client2: nx
+end_test_can
+
+search client5 nx
+test_search client5 client3 client1 null client5 client3 client1 null client5 client3 client1 null client5 client0 client1 null client5 client2
+
+add client5 pcm
+begin_test_can
+    client3: client1, client4, client5
+    client4: client1, client3
+    client5: client0, client3, client2
+    client0: client1, client5, client2
+    client1: client3, client4, client0
+    client2: client0, client5
+  --- stored documents ---
+    client3: 
+    client4: 
+    client5: pcm
+    client0: 
+    client1: 
+    client2: nx
+end_test_can
+add client3 xuv
+begin_test_can
+    client3: client1, client4, client5
+    client4: client1, client3
+    client5: client0, client3, client2
+    client0: client1, client5, client2
+    client1: client3, client4, client0
+    client2: client0, client5
+  --- stored documents ---
+    client3: 
+    client4: 
+    client5: xuv, pcm
+    client0: 
+    client1: 
+    client2: nx
+end_test_can
