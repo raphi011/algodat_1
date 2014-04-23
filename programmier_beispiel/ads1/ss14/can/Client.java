@@ -4,15 +4,15 @@ import ads1.ss14.can.exceptions.CANException;
 import ads1.ss14.can.exceptions.NoAdditionalStorageAvailable;
 import ads1.ss14.can.exceptions.NoSuchDocument;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 public class Client implements ClientInterface, ClientCommandInterface{
 
     private String uniqueID;
     private int networkXSize,networkYSize,maxNumberOfDocuments;
     private HashMap<String,Pair<Document,Position>> documents;
-    private ArrayList<ClientInterface> neighbours;
+    private LinkedList<ClientInterface> neighbours;
     private Area area;
 
     /**
@@ -27,7 +27,11 @@ public class Client implements ClientInterface, ClientCommandInterface{
         this.networkYSize = networkYSize;
 
         this.documents = new HashMap<String, Pair<Document,Position>>();
-        this.neighbours = new ArrayList<ClientInterface>();
+        this.neighbours = new LinkedList<ClientInterface>();
+    }
+
+    public int getSize() {
+        return networkXSize * networkYSize;
     }
 
     @Override
@@ -99,11 +103,11 @@ public class Client implements ClientInterface, ClientCommandInterface{
 
     @Override
     public void removeNeighbour(String clientID) {
-        ClientInterface clientToRemove = null;
+        LinkedList<ClientInterface> neighboursCopy = new LinkedList<ClientInterface>(neighbours);
 
-        for (ClientInterface client : getNeighbours()) {
+        for (ClientInterface client : neighboursCopy) {
             if (client.getUniqueID().equals(clientID)) {
-                neighbours.remove(clientToRemove);
+                neighbours.remove(client);
                 return;
             }
         }
@@ -112,19 +116,19 @@ public class Client implements ClientInterface, ClientCommandInterface{
     public ClientInterface getNearestNeighbour(Position p) {
 
         ClientInterface nearestNeighbour = null;
-        double distance = 0;
+        double distance = -1;
 
         for (ClientInterface client : getNeighbours()) {
             Area area = client.getArea();
-            int x = (int)Math.max(Math.min(area.getUpperX(), p.getX()), area.getLowerX());
-            int y = (int)Math.max(Math.min(area.getUpperY(), p.getY()), area.getLowerY());
-            double q =  Math.sqrt(Math.pow(x - p.getX(),2) + Math.pow(y - p.getY(),2));
+            double x = Math.max(Math.min(area.getUpperX(), p.getX()), area.getLowerX());
+            double y = Math.max(Math.min(area.getUpperY(), p.getY()), area.getLowerY());
+            double q = Math.sqrt(Math.pow(x - p.getX(),2) + Math.pow(y - p.getY(),2));
 
-            if (distance == 0 || q < distance) {
+            if (distance == -1 || q < distance) {
                 distance = q;
                 nearestNeighbour = client;
 
-            } else if (q == distance && client.getUniqueID().compareTo(nearestNeighbour.getUniqueID()) < 0) {
+            } else if (q == distance && client.getUniqueID().compareTo(nearestNeighbour.getUniqueID()) > 0) {
                 nearestNeighbour = client;
             }
         }
@@ -185,37 +189,31 @@ public class Client implements ClientInterface, ClientCommandInterface{
         }
     }
 
-    @Override
     public void adaptNeighbours(ClientInterface joiningClient) {
 
-        boolean horizontalSplit = this.getArea().getLowerX() == joiningClient.getArea().getLowerX();
-
+        LinkedList<ClientInterface> neighboursCopy = new LinkedList<ClientInterface>(neighbours);
+        boolean verticalSplit = this.getArea().getLowerY() == joiningClient.getArea().getLowerY();
         Area joiningArea = joiningClient.getArea();
-        double joiningLower = horizontalSplit ? joiningArea.getLowerY() : joiningArea.getLowerX();
-        double joiningUpper = horizontalSplit ? joiningArea.getUpperY() : joiningArea.getUpperX();
-
-        ArrayList<ClientInterface> neighboursCopy = new ArrayList<ClientInterface>(neighbours);
 
         for (ClientInterface neighbour : neighboursCopy) {
             Area neighbourArea = neighbour.getArea();
 
-            double neighbourLower = horizontalSplit ? neighbourArea.getLowerY() : neighbourArea.getLowerX();
-            double neighbourUpper = horizontalSplit ? neighbourArea.getUpperY() : neighbourArea.getUpperX();
+            if (isLowerOrRightNeighbour(neighbourArea,joiningArea,verticalSplit)) {
 
-            if (horizontalSplit && neighbourUpper == joiningLower ||
-                    !horizontalSplit && neighbourLower == joiningUpper) {
-                neighbour.removeNeighbour(this.uniqueID);
-                neighbour.addNeighbour(joiningClient);
-                this.removeNeighbour(neighbour.getUniqueID());
-                joiningClient.addNeighbour(neighbour);
-            } else if (neighbourLower <= joiningLower && joiningLower < neighbourUpper ||
-                       neighbourLower < joiningUpper && joiningUpper <= neighbourUpper) {
-                joiningClient.addNeighbour(neighbour);
-                neighbour.addNeighbour(joiningClient);
-            } else if (!(neighbourLower <= joiningLower && joiningLower < neighbourUpper ||
-                         neighbourLower < joiningUpper && joiningUpper <= neighbourUpper)) {
                 this.removeNeighbour(neighbour.getUniqueID());
                 neighbour.removeNeighbour(this.uniqueID);
+                joiningClient.addNeighbour(neighbour);
+                neighbour.addNeighbour(joiningClient);
+            } else if (isHorizontalOrVertical(neighbourArea, joiningArea, verticalSplit)) {
+
+
+                if (isHorizontalOrVerticalNeighbour(neighbourArea,joiningArea,verticalSplit)) {
+                    joiningClient.addNeighbour(neighbour);
+                    neighbour.addNeighbour(joiningClient);
+                } if (!isHorizontalOrVerticalNeighbour(neighbourArea,this.getArea(),verticalSplit)) {
+                    this.removeNeighbour(neighbour.getUniqueID());
+                    neighbour.removeNeighbour(this.uniqueID);
+                }
             }
         }
 
@@ -223,17 +221,41 @@ public class Client implements ClientInterface, ClientCommandInterface{
         joiningClient.addNeighbour(this);
     }
 
+    private boolean isLowerOrRightNeighbour(Area neighbourArea, Area joiningArea, boolean verticalSplit) {
+
+        if (verticalSplit) return neighbourArea.getLowerX() == joiningArea.getUpperX();
+        else return neighbourArea.getUpperY() == joiningArea.getLowerY();
+    }
+
+    private boolean isHorizontalOrVertical(Area neighbourArea, Area joiningArea, boolean verticalSplit) {
+        if (verticalSplit)
+            return neighbourArea.getLowerY() == joiningArea.getUpperY() ||
+                   neighbourArea.getUpperY() == joiningArea.getLowerY();
+        else
+            return neighbourArea.getLowerX() == joiningArea.getUpperX() ||
+                   neighbourArea.getUpperX() == joiningArea.getLowerX();
+    }
+
+    private boolean isHorizontalOrVerticalNeighbour(Area neighbourArea, Area joiningArea, boolean verticalSplit) {
+        if (verticalSplit)
+            return (neighbourArea.getLowerX() <= joiningArea.getLowerX() && joiningArea.getLowerX() < neighbourArea.getUpperX()) ||
+                    (neighbourArea.getLowerX() < joiningArea.getUpperX() && joiningArea.getUpperX() <= neighbourArea.getUpperX());
+        else
+            return (neighbourArea.getLowerY() <= joiningArea.getLowerY() && joiningArea.getLowerY() < neighbourArea.getUpperY()) ||
+                    (neighbourArea.getLowerY() < joiningArea.getUpperY() && joiningArea.getUpperY() <= neighbourArea.getUpperY());
+    }
+
     @Override
     public Iterable<Pair<Document, Position>> removeUnmanagedDocuments() {
-        ArrayList<Pair<Document, Position>> unmanagedDocuments = new ArrayList<Pair<Document, Position>>();
+        LinkedList<Pair<Document, Position>> unmanagedDocuments = new LinkedList<Pair<Document, Position>>();
 
-        for (Pair<Document,Position> pair : documents.values()) {
-            if (!this.area.contains(pair.second)){
+        for (Pair<Document,Position> pair : documents.values())
+            if (!this.area.contains(pair.second))
                 unmanagedDocuments.add(pair);
-                // don't know if this will work in the same loop ..
-                documents.remove(pair.first.getName());
-            }
-        }
+
+        for (Pair<Document,Position> doc : unmanagedDocuments)
+            documents.remove(doc.first.getName());
+
 
         return unmanagedDocuments;
     }
@@ -242,7 +264,7 @@ public class Client implements ClientInterface, ClientCommandInterface{
     @Override
     public void addDocumentToNetwork(Document d) throws CANException {
 
-        for (int i = 0; i <10; i++) {
+        for (int i = 0; i <getSize(); i++) {
             Position p = getPosition(d.getName(),i);
             ClientInterface client = searchForResponsibleClient(p);
 
@@ -256,7 +278,7 @@ public class Client implements ClientInterface, ClientCommandInterface{
     @Override
     public void removeDocumentFromNetwork(String documentName) {
 
-        for (int i = 0; i <10; i++) {
+        for (int i = 0; i <getSize(); i++) {
             Position p = getPosition(documentName,i);
             ClientInterface client = searchForResponsibleClient(p);
 
@@ -269,17 +291,24 @@ public class Client implements ClientInterface, ClientCommandInterface{
 
     @Override
     public Document searchForDocument(String documentName) throws CANException {
+        Document doc = null;
 
-        for (int i = 0; i <10; i++) {
+        for (int i = 0; i <getSize(); i++) {
             Position p = getPosition(documentName,i);
             ClientInterface client = searchForResponsibleClient(p);
 
             try {
-                return client.getDocument(documentName);
+                doc = client.getDocument(documentName);
+                break;
             } catch (NoSuchDocument ex) { }
         }
 
-        return null;
+        return doc;
+    }
+
+    @Override
+    public String toString() {
+        return this.getUniqueID();
     }
 
     private int hash(String name, int i) {
